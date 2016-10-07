@@ -3,7 +3,7 @@ import java.util.List;
 public class Grid {
 	private final static int NB_ROW = 7;
 	private final static int NB_COL = 7;
-
+	
 	/**
 	 * Création de la grille de points initiale
 	 * 
