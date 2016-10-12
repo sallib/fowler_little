@@ -37,30 +37,8 @@ public class Main {
 		// Affiche les ID des points de la grille ==> OK
 		//displayMatrix(grid, NB_COL);
 
-		// Matrice 3x3
-		//Divise la grille de points "grid" en matrices 3x3 (fenêtre glissante)
-		//TODO : 
-			//comparer les points coté avec le centre de la matrice (SIGNE + ou -)
-			//Déterminer si c'est un SOMMET, CREUX ou INDEFINI
-			//Si INDEFINI => compter le nombre de cycle
-				//Si Nombre de cycle est compris entre 2 et 4 => PASSE
-		Point[][] matrix3 = new Point[3][3];
-		for (int row = 0; row < NB_ROW -2; row++) {
-			for (int col = 0; col<NB_COL-2; col++) {
-			int a = 0;
-			int b = 0;
-			System.out.println("**"+row + " "+col);
-			for (int i = row; i < row + 3; i++) {
-				for (int j = col; j < col + 3; j++) {
-					matrix3[a][b] = grid[i][j];
-					b++;
-				}
-				b = 0;
-				a++;
-			}
-			displayMatrix(matrix3, 3);
-			//TODO : Traitements à faire !!
-		}}
+		Point[][] finalGrid = Fowler_little.selectPoints(grid);
+		
 		
 		
 
