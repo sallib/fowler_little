@@ -2,12 +2,12 @@
 public class Point {
 
 	private final int id; // TODO A supprimer -> sert pour test
-	private final double x;
+	private final double x; 
 	private final double y;
 	private final double z;
-	private final Type type;
-	private int posX;
-	private int posY;
+	private Type type; 
+	private int posX; //Sauvegarde la position X sur la matrice originale
+	private int posY;//Sauvegarde la position X sur la matrice originale
 
 	public Point(int id, double x, double y, double z) {
 		this.id = id; // TODO A supprimer -> sert pour test
@@ -39,6 +39,9 @@ public class Point {
 
 	public void setPosY(int posY) {
 		this.posY = posY;
+	}
+	public void setType(Type type) {
+		this.type = type;
 	}
 
 	@Override

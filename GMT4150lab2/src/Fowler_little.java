@@ -60,7 +60,6 @@ public class Fowler_little {
 				n++;
 			}
 		}
-		System.out.println("+++++++++++++++++++++++++++++++" + n);
 		return n;
 	}
 
@@ -84,17 +83,26 @@ public class Fowler_little {
 			}
 
 		}
+		
+		int posX = matrix3[1][1].getPosX();
+		int posY = matrix3[1][1].getPosY();
+				
 		if (nSommet == 8) {
-			System.out.println("C'est un creux !! ");
+			grid[posX][posY].setType(Type.CREUX);
+			System.out.println("CREUX");
+			
 		} else if (nCreux == 8) {
-			System.out.println("C'est un sommet !");
+			grid[posX][posY].setType(Type.SOMMET);
+			System.out.println("SOMMET");
 		} else {
-			System.out.println("Cherchons !");
+			//On compte le nb de cycle pour savoir si c'est une passe
 			int nCycle = countCycle(elevationProfile);
 			if (nCycle >= 2 && nCycle <= 4) {
-				System.out.println("C'est une passe !");
+				grid[posX][posY].setType(Type.PASSE);
+				System.out.println("PASSE");
 			} else {
-				System.out.println("ben je sais pas");
+				grid[posX][posY].setType(Type.INDEFINI);
+				System.out.println("INDEFINI");
 			}
 		}
 	}
@@ -119,16 +127,24 @@ public class Fowler_little {
 			if (posX > 0) {
 				diff = elevCenter - grid[posX - 1][posY].getZ();
 			} else {
-				diff = 1;// FAUX
+				diff = 1;
 			}
 			// coin haut droite
 		} else if (i == 0 && j == 2) {
-			diff = elevCenter - grid[posX + 1][posY + 1].getZ();
+			if (posX < NB_ROW - 1) {
+				if (posY < NB_COL - 1) {
+					diff = elevCenter - grid[posX + 1][posY + 1].getZ();
+				} else {
+					diff = elevCenter - grid[posX + 1][posY].getZ();
+				}
+			} else {
+				diff = elevCenter - grid[posX][posY + 1].getZ();
+			}
 		} else if (i == 1 && j == 0) {
 			if (posY > 0) {
 				diff = elevCenter - grid[posX][posY - 1].getZ();
 			} else {
-				diff = 1; // FAUX
+				diff = 1;
 			}
 			// Coin bas gauche
 		} else if (i == 2 && j == 0) {
@@ -145,12 +161,16 @@ public class Fowler_little {
 			if (posX < NB_ROW - 1) {
 				diff = elevCenter - grid[posX + 1][posY].getZ();
 			} else {
-				diff = 1; // FAUX
+				diff = 1;
 			}
 			// Coin bas droit
 		} else if (i == 2 && j == 2) {
 			if (posY < NB_COL - 1) {
-				diff = elevCenter - grid[posX + 1][posY + 1].getZ();
+				if (posX < NB_ROW - 1) {
+					diff = elevCenter - grid[posX + 1][posY + 1].getZ();
+				} else {
+					diff = elevCenter - grid[posX][posY + 1].getZ();
+				}
 			} else {
 				diff = elevCenter - grid[posX + 1][posY].getZ();
 			}
@@ -158,7 +178,7 @@ public class Fowler_little {
 			if (posY < NB_COL - 1) {
 				diff = elevCenter - grid[posX][posY + 1].getZ();
 			} else {
-				diff = 1;// FAUX
+				diff = 1;
 			}
 		}
 		return diff;
@@ -179,13 +199,14 @@ public class Fowler_little {
 					// de chaque point coté
 
 					double diff = elevCenter - matrix3[i][j].getZ();
-					while (elevationProfile[i][j] == null || elevationProfile[i][j].equals("=")) {
+					//Analyse des points voisins
+					while (elevationProfile[i][j] == null) {
 						if (diff < 0) {
 							elevationProfile[i][j] = "+";
 						} else if (diff > 0) {
 							elevationProfile[i][j] = "-";
 						} else {
-							elevationProfile[i][j] = "=";
+							//Cas d'égalité
 							diff = egality(matrix3, i, j, elevCenter);
 
 						}
