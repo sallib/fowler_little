@@ -10,6 +10,9 @@ public class Fowler_little {
 		this.grid = grid;
 	}
 
+	public Point[][] getGrid(){
+		return grid;
+	}
 	/**
 	 * Affichage des ID des points d'une matrice ==> Pour les tests !
 	 * 
@@ -63,16 +66,22 @@ public class Fowler_little {
 		return n;
 	}
 
+	/**
+	 * Attribut un profil chaque point (Sommet / Creux / Passe / Indefini)
+	 * 
+	 * @param matrix3
+	 */
 	public void setProfile(Point[][] matrix3) {
+		// Création du profil d'élévation (+ ou -)
 		String[][] elevationProfile = cycle(matrix3);
-		displayCycle(elevationProfile, 3);
+		displayCycle(elevationProfile, 3); // TODO : a supprimer
 		int nSommet = 0;
 		int nCreux = 0;
+		// Compte le nombre de + et le nombre de -
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				// On ne compte pas le centre
 				if (i == 1 && j == 1) {
-					// Nothing
+					// Nothing : on ne compte pas le centre
 				} else {
 					if (elevationProfile[i][j].equals("+")) {
 						nSommet++;
@@ -83,19 +92,19 @@ public class Fowler_little {
 			}
 
 		}
-		
+		// On récupère les coordonnées de la matrice initiale
 		int posX = matrix3[1][1].getPosX();
 		int posY = matrix3[1][1].getPosY();
-				
+
 		if (nSommet == 8) {
 			grid[posX][posY].setType(Type.CREUX);
 			System.out.println("CREUX");
-			
+
 		} else if (nCreux == 8) {
 			grid[posX][posY].setType(Type.SOMMET);
 			System.out.println("SOMMET");
 		} else {
-			//On compte le nb de cycle pour savoir si c'est une passe
+			// On compte le nb de cycle pour savoir si c'est une passe
 			int nCycle = countCycle(elevationProfile);
 			if (nCycle >= 2 && nCycle <= 4) {
 				grid[posX][posY].setType(Type.PASSE);
@@ -107,6 +116,16 @@ public class Fowler_little {
 		}
 	}
 
+	/**
+	 * Traite le cas ou le point central a une élévationn égale au point de coté
+	 * Dans ce cas on regarde les points autours
+	 * 
+	 * @param matrix3
+	 * @param i
+	 * @param j
+	 * @param elevCenter
+	 * @return La différence d'élévation
+	 */
 	private double egality(Point[][] matrix3, int i, int j, double elevCenter) {
 		double diff = 0;
 		int posX = matrix3[i][j].getPosX();
@@ -185,6 +204,13 @@ public class Fowler_little {
 
 	}
 
+	/**
+	 * Création d'une matrice avec le profil d'élévation par rapport au point
+	 * central
+	 * 
+	 * @param matrix3
+	 * @return matrice avec le profile d'élévation (+ et -)
+	 */
 	public String[][] cycle(Point[][] matrix3) {
 		String[][] elevationProfile = new String[3][3];
 		double elevCenter = matrix3[1][1].getZ();
@@ -192,21 +218,22 @@ public class Fowler_little {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
 				if (i == 1 && j == 1) {
-					// Nothing
+					// Nothing : on ne passe pas le centre
 				} else {
 					// Différence entre l'élévation du point central et
 					// l'élévation
 					// de chaque point coté
 
 					double diff = elevCenter - matrix3[i][j].getZ();
-					//Analyse des points voisins
+					// Analyse des points voisins : on boucle jusqu'à déterminer
+					// + ou -
 					while (elevationProfile[i][j] == null) {
 						if (diff < 0) {
 							elevationProfile[i][j] = "+";
 						} else if (diff > 0) {
 							elevationProfile[i][j] = "-";
 						} else {
-							//Cas d'égalité
+							// Cas d'égalité
 							diff = egality(matrix3, i, j, elevCenter);
 
 						}
@@ -218,14 +245,10 @@ public class Fowler_little {
 		return elevationProfile;
 	}
 
+	/**
+	 * Création des matrices 3x3 (fenêtre glissante) On
+	 */
 	public void matrix3() {
-		// Matrice 3x3
-		// Divise la grille de points "grid" en matrices 3x3 (fenêtre glissante)
-		// TODO :
-		// comparer les points coté avec le centre de la matrice (SIGNE + ou -)
-		// Déterminer si c'est un SOMMET, CREUX ou INDEFINI
-		// Si INDEFINI => compter le nombre de cycle
-		// Si Nombre de cycle est compris entre 2 et 4 => PASSE
 		Point[][] matrix3 = new Point[3][3];
 		for (int row = 0; row < NB_ROW - 2; row++) {
 			for (int col = 0; col < NB_COL - 2; col++) {
@@ -240,8 +263,9 @@ public class Fowler_little {
 					b = 0;
 					a++;
 				}
-				displayMatrix(matrix3, 3);
-				// TODO : Traitements à faire !!
+				displayMatrix(matrix3, 3); // TODO : suppression
+				// Attribution des profile type (Sommet / Creux / Passe /
+				// Indefini)
 				setProfile(matrix3);
 
 			}

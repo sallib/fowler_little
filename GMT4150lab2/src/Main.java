@@ -16,7 +16,7 @@ public class Main {
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
 				Point p = matrix[i][j];
-				System.out.print(p.getId() + " ");
+				System.out.print(p.getZ() + " ");
 			}
 			System.out.println("\n");
 		}
@@ -39,8 +39,9 @@ public class Main {
 
 		//Fichier de résultat
 		Fowler_little fl = new Fowler_little(grid);
-		
+		//displayMatrix(fl.getGrid(), 7);
 		Point[][] finalGrid = fl.selectPoints();
+		
 		
 		
 		
