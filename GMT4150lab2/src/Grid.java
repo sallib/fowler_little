@@ -18,7 +18,10 @@ public class Grid {
 											// gauche à droite
 			for (int i = NB_ROW - 1; i >= 0; i--) {// Parcours des lignes de bas
 													// en haut
-				grid[i][j] = points.get(index);
+				Point tmp = points.get(index);
+				tmp.setPosX(i);
+				tmp.setPosY(j);
+				grid[i][j] = tmp;
 				index++;
 			}
 		}

@@ -37,7 +37,10 @@ public class Main {
 		// Affiche les ID des points de la grille ==> OK
 		//displayMatrix(grid, NB_COL);
 
-		Point[][] finalGrid = Fowler_little.selectPoints(grid);
+		//Fichier de résultat
+		Fowler_little fl = new Fowler_little(grid);
+		
+		Point[][] finalGrid = fl.selectPoints();
 		
 		
 		
