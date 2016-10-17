@@ -1,0 +1,5 @@
+
+public enum Type {
+	SOMMET, CREUX, TALWEG, CRETE, PASSE, INDEFINI
+}
+
