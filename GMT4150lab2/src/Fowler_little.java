@@ -10,9 +10,10 @@ public class Fowler_little {
 		this.grid = grid;
 	}
 
-	public Point[][] getGrid(){
+	public Point[][] getGrid() {
 		return grid;
 	}
+
 	/**
 	 * Affichage des ID des points d'une matrice ==> Pour les tests !
 	 * 
@@ -272,9 +273,195 @@ public class Fowler_little {
 		}
 	}
 
+
+
+	/**
+	 * Analyse la matrice terrain selon une grille glissante de 2x2.
+	 * 
+	 * @return information de Crête ou de Talweg ou d'indéfinie.
+	 * @param grid
+	 *            le terrain
+	 */
+	private  void matrix2() {
+		// parcours du grid terrain entier.
+		for (int row = 1; row < NB_ROW - 1; row++) { // de row = 1 à row = 5
+														// /////// etape A
+			for (int col = 1; col < NB_COL - 1; col++) { // de col = 1 à col = 5
+															// /////// etape A
+				// pour chaque cellule analysable générer une analyse de 4
+				// fenêtres de 2x2
+				// une cellule analysable doit être une passe ou indéfini.
+				if (grid[row][col].getType() == Type.PASSE || grid[row][col].getType() == Type.INDEFINI) {
+					Point current = grid[row][col];
+					// parcourir current row-1 à row+1 et col-1 à col+1 =
+					// fenêtre 2x2 == parcours de la fenêtre 3x3 à décomposer en
+					// fenêtre 2x2
+					Point[][][] fenetres2x2 = new Point[4][2][2];
+					decomposeFenetre2x2(row, col, fenetres2x2); /////// etape
+																		/////// C
+					// pour chacune des 4 fenêtres :
+					analyseFenetre2x2(fenetres2x2, current); /////// etape D
+				}
+				// si jamais le plus haut : crête
+				// si jamais le plus bas : talweg
+				// IsNotCrete == TRUE && IsNotTalweg == TRUE ? status =
+				// indefinie : status = crete || talweg
+			}
+			// TODO : Traitements à faire !!
+		}
+
+	}
+
+	/**
+	 * Méthode d'analyse des 4 fenêtres pour identifier les crêtes et talweg.
+	 * Modifie la valeur Type des points en fonction du résultat {TALWEG,
+	 * CRETE,INDEFINI}
+	 * 
+	 * @param fenetres2x2
+	 * @param current
+	 */
+	private void analyseFenetre2x2(Point[][][] fenetres2x2, Point current) { /////// etape
+																					/////// D
+		Point max = fenetres2x2[0][0][0];// définition du min et max au point
+											// haut gauche pour démarrer le
+											// traitement.
+		Point min = fenetres2x2[0][0][0];
+		// Pour chaque fenêtre 2x2, current est-il > ou < à la valeur testée.
+		// max MAX ? rien : max = current
+		// min MIN ? rien : min = current
+		for (Point[][] fenetre : fenetres2x2) {
+			for (int i = 0; i < 2; i++) {
+				for (int j = 0; j < 2; j++) {
+					if (fenetre[i][j].getZ() > max.getZ()) {
+						max = fenetre[i][j];
+					} else if (fenetre[i][j].getZ() < min.getZ()) {
+						min = fenetre[i][j];
+					}
+				}
+			}
+		}
+		changeCurrentStatus(current, max, min);
+
+	}
+
+	/**
+	 * Méthode de mise à jour du statut du point courrant.
+	 * 
+	 * @param current
+	 *            point analysé par les fenêtres 2x2
+	 * @param max
+	 *            point le plus élevé retenu des 4 fenêtres 2x2
+	 * @param min
+	 *            point le plus bas retenu des 4 fenêtres 2x2
+	 */
+	private void changeCurrentStatus(Point current, Point max, Point min) {
+		boolean isNotRidge = false;
+		boolean isNotThalweg = false;
+		if (current.getId() == max.getId()) { // si "jamais le plus haut", peut
+												// être une talweg.
+			isNotThalweg = true;
+		}
+		if (current.getId() == min.getId()) {// si "jamais le plus bas", peut
+												// être une crête.
+			isNotRidge = true;
+		}
+		if (isNotRidge && isNotThalweg) { // si current est les deux, on
+											// l'élimine car le point est
+											// quelconque
+			current.setType(Type.INDEFINI);
+		} else if (isNotRidge) {
+			current.setType(Type.TALWEG);
+		} else if (isNotThalweg) {
+			current.setType(Type.CRETE);
+		} else {
+			current.setType(Type.PASSE);// si current est aucun des deux: reste
+										// à passe.
+		}
+
+	}
+
+	/**
+	 * @param row
+	 *            identifiant colonne de la cellule courante
+	 * @param col
+	 *            identifiant ligne de la cellule courante
+	 * @param grid
+	 *            matrice terrain
+	 * @param fenetres2x2
+	 *            paramètre complété par la méthode
+	 */
+	private void decomposeFenetre2x2(int row, int col, Point[][][] fenetres2x2) { /// etape
+																											/// C
+		int a = 0; // identifiant colonne de matrice3x3
+		int b = 0; // identifiant ligne de matrice3x3
+		for (int i = row - 1; i < row + 2; i++) { /////// etape B
+			for (int j = col - 1; j < col + 2; j++) { /////// etape B
+				switch (a) {
+				case 0:
+					switch (b) {
+					case 0:
+						fenetres2x2[0][a][b] = grid[i][j];
+						break;
+					case 1:
+						fenetres2x2[0][a][b] = grid[i][j];
+						fenetres2x2[2][a][b - 1] = grid[i][j];
+						break;
+					case 2:
+						fenetres2x2[2][a][b - 1] = grid[i][j];
+						break;
+					default: // never happens
+						break;
+					}
+					break;
+				case 1:
+					switch (b) {
+					case 0:
+						fenetres2x2[0][a][b] = grid[i][j];
+						fenetres2x2[1][a - 1][b] = grid[i][j];
+						break;
+					case 1:
+						fenetres2x2[0][a][b] = grid[i][j];
+						fenetres2x2[1][a - 1][b] = grid[i][j];
+						fenetres2x2[2][a][b - 1] = grid[i][j];
+						fenetres2x2[3][a - 1][b - 1] = grid[i][j];
+						break;
+					case 2:
+						fenetres2x2[2][a][b - 1] = grid[i][j];
+						fenetres2x2[3][a - 1][b - 1] = grid[i][j];
+						break;
+					default: // never happens
+						break;
+					}
+					break;
+				case 2:
+					switch (b) {
+					case 0:
+						fenetres2x2[1][a - 1][b] = grid[i][j];
+						break;
+					case 1:
+						fenetres2x2[1][a - 1][b] = grid[i][j];
+						fenetres2x2[3][a - 1][b - 1] = grid[i][j];
+						break;
+					case 2:
+						fenetres2x2[3][a - 1][b - 1] = grid[i][j];
+						break;
+					default: // never happens
+						break;
+					}
+					break;
+				default:// never happens
+					break;
+				}
+				b++;
+			}
+			b = 0;
+			a++;
+		}
+	}
 	public Point[][] selectPoints() {
 		/// TODO
 		matrix3();
+		matrix2();
 		return null;
 	}
 
