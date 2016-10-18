@@ -43,7 +43,7 @@ public class CsvFileReader {
 
 	public static void writeFile(Point[][] output) throws IOException{
 		FileWriter fileWriter = new FileWriter("output.csv");
-		fileWriter.write("Ident;X;Y;Z\n");
+		fileWriter.write("Ident;X;Y;Z;Type\n");
 		StringBuilder sb = new StringBuilder();
 		for(int i =1; i<Main.NB_ROW-1;i++){
 			for(int j=1; j<Main.NB_COL-1;j++){
