@@ -41,7 +41,11 @@ public class Fowler_little {
 		System.out.println("*************");
 	}
 
-	// TODO compter le nombre de cycles
+	/**
+	 * Compte le nombre de cycle
+	 * @param elevationProfile
+	 * @return nombre de cycle
+	 */
 	public int countCycle(String[][] elevationProfile) {
 		List<String> list = new ArrayList<>();
 		int n = 0;
@@ -78,6 +82,7 @@ public class Fowler_little {
 		displayCycle(elevationProfile, 3); // TODO : a supprimer
 		int nSommet = 0;
 		int nCreux = 0;
+		int nEgal = 0;
 		// Compte le nombre de + et le nombre de -
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -86,8 +91,10 @@ public class Fowler_little {
 				} else {
 					if (elevationProfile[i][j].equals("+")) {
 						nSommet++;
-					} else {
+					} else if (elevationProfile[i][j].equals("-")) {
 						nCreux++;
+					} else {
+						nEgal++;
 					}
 				}
 			}
@@ -97,22 +104,20 @@ public class Fowler_little {
 		int posX = matrix3[1][1].getPosX();
 		int posY = matrix3[1][1].getPosY();
 
-		if (nSommet == 8) {
+		// Uniquement cas où l'égalité est en bordure de la matrice
+		if (nEgal > 0) {
+			grid[posX][posY].setType(Type.INDEFINI);
+		} else if (nSommet == 8) {
 			grid[posX][posY].setType(Type.CREUX);
-			System.out.println("CREUX");
-
 		} else if (nCreux == 8) {
 			grid[posX][posY].setType(Type.SOMMET);
-			System.out.println("SOMMET");
 		} else {
 			// On compte le nb de cycle pour savoir si c'est une passe
 			int nCycle = countCycle(elevationProfile);
 			if (nCycle >= 2 && nCycle <= 4) {
 				grid[posX][posY].setType(Type.PASSE);
-				System.out.println("PASSE");
 			} else {
 				grid[posX][posY].setType(Type.INDEFINI);
-				System.out.println("INDEFINI");
 			}
 		}
 	}
@@ -147,7 +152,7 @@ public class Fowler_little {
 			if (posX > 0) {
 				diff = elevCenter - grid[posX - 1][posY].getZ();
 			} else {
-				diff = 1;
+				diff = -9999;
 			}
 			// coin haut droite
 		} else if (i == 0 && j == 2) {
@@ -164,7 +169,7 @@ public class Fowler_little {
 			if (posY > 0) {
 				diff = elevCenter - grid[posX][posY - 1].getZ();
 			} else {
-				diff = 1;
+				diff = -9999;
 			}
 			// Coin bas gauche
 		} else if (i == 2 && j == 0) {
@@ -181,7 +186,7 @@ public class Fowler_little {
 			if (posX < NB_ROW - 1) {
 				diff = elevCenter - grid[posX + 1][posY].getZ();
 			} else {
-				diff = 1;
+				diff = -9999;
 			}
 			// Coin bas droit
 		} else if (i == 2 && j == 2) {
@@ -198,7 +203,7 @@ public class Fowler_little {
 			if (posY < NB_COL - 1) {
 				diff = elevCenter - grid[posX][posY + 1].getZ();
 			} else {
-				diff = 1;
+				diff = -9999;
 			}
 		}
 		return diff;
@@ -229,7 +234,11 @@ public class Fowler_little {
 					// Analyse des points voisins : on boucle jusqu'à déterminer
 					// + ou -
 					while (elevationProfile[i][j] == null) {
-						if (diff < 0) {
+						//Cas d'égalité en bordure de matrice
+						if (diff == -9999){
+							elevationProfile[i][j] = "?";
+						}
+						else if (diff < 0) {
 							elevationProfile[i][j] = "+";
 						} else if (diff > 0) {
 							elevationProfile[i][j] = "-";
@@ -255,7 +264,6 @@ public class Fowler_little {
 			for (int col = 0; col < NB_COL - 2; col++) {
 				int a = 0;
 				int b = 0;
-				System.out.println("**" + row + " " + col);
 				for (int i = row; i < row + 3; i++) {
 					for (int j = col; j < col + 3; j++) {
 						matrix3[a][b] = grid[i][j];
@@ -264,7 +272,6 @@ public class Fowler_little {
 					b = 0;
 					a++;
 				}
-				displayMatrix(matrix3, 3); // TODO : suppression
 				// Attribution des profile type (Sommet / Creux / Passe /
 				// Indefini)
 				setProfile(matrix3);
@@ -273,8 +280,6 @@ public class Fowler_little {
 		}
 	}
 
-
-
 	/**
 	 * Analyse la matrice terrain selon une grille glissante de 2x2.
 	 * 
@@ -282,7 +287,7 @@ public class Fowler_little {
 	 * @param grid
 	 *            le terrain
 	 */
-	private  void matrix2() {
+	private void matrix2() {
 		// parcours du grid terrain entier.
 		for (int row = 1; row < NB_ROW - 1; row++) { // de row = 1 à row = 5
 														// /////// etape A
@@ -298,7 +303,7 @@ public class Fowler_little {
 					// fenêtre 2x2
 					Point[][][] fenetres2x2 = new Point[4][2][2];
 					decomposeFenetre2x2(row, col, fenetres2x2); /////// etape
-																		/////// C
+																/////// C
 					// pour chacune des 4 fenêtres :
 					analyseFenetre2x2(fenetres2x2, current); /////// etape D
 				}
@@ -321,7 +326,7 @@ public class Fowler_little {
 	 * @param current
 	 */
 	private void analyseFenetre2x2(Point[][][] fenetres2x2, Point current) { /////// etape
-																					/////// D
+																				/////// D
 		Point max = fenetres2x2[0][0][0];// définition du min et max au point
 											// haut gauche pour démarrer le
 											// traitement.
@@ -391,7 +396,7 @@ public class Fowler_little {
 	 *            paramètre complété par la méthode
 	 */
 	private void decomposeFenetre2x2(int row, int col, Point[][][] fenetres2x2) { /// etape
-																											/// C
+																					/// C
 		int a = 0; // identifiant colonne de matrice3x3
 		int b = 0; // identifiant ligne de matrice3x3
 		for (int i = row - 1; i < row + 2; i++) { /////// etape B
@@ -458,6 +463,7 @@ public class Fowler_little {
 			a++;
 		}
 	}
+
 	public Point[][] selectPoints() {
 		/// TODO
 		matrix3();
